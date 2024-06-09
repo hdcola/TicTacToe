@@ -1,155 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tic-Tac-Toe Game</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <h1>Welcome to Tic-Tac-Toe Game</h1>
-    <div>
-      <p>
-        Instructions:
-        <span class="emphasize">Click</span>
-        on an blank space to place your piece.
-      </p>
-    </div>
-    <div id="tic-tac-toe-board">
-      <div class="row">
-        <div class="cell" id="cell-1"></div>
-        <div class="cell" id="cell-2"></div>
-        <div class="cell" id="cell-3"></div>
-      </div>
-      <div class="row">
-        <div class="cell" id="cell-4"></div>
-        <div class="cell" id="cell-5"></div>
-        <div class="cell" id="cell-6"></div>
-      </div>
-      <div class="row">
-        <div class="cell" id="cell-7"></div>
-        <div class="cell" id="cell-8"></div>
-        <div class="cell" id="cell-9"></div>
-      </div>
-    </div>
-    <div id="gameMessage" class="game-message"></div>
-    <button id="resetButton">Reset Game</button>
-    <script src="script.js"></script>
-    <div>
-      <div>
-        <h3>Last 2 Historical Games with winners:</h3>
-      </div>
-      <section>
-        <p id="showGameOrder0"></p>
-        <div id="historical0" class="historical">
-          <div class="hrow">
-            <div class="hcell0" id="hcell0-1"></div>
-            <div class="hcell0" id="hcell0-2"></div>
-            <div class="hcell0" id="hcell0-3"></div>
-          </div>
-          <div class="hrow">
-            <div class="hcell0" id="hcell0-4"></div>
-            <div class="hcell0" id="hcell0-5"></div>
-            <div class="hcell0" id="hcell0-6"></div>
-          </div>
-          <div class="hrow">
-            <div class="hcell0" id="hcell-7"></div>
-            <div class="hcell0" id="hcell-8"></div>
-            <div class="hcell0" id="hcell-9"></div>
-          </div>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/dist/full.min.css" rel="stylesheet" type="text/css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+
+        }
+    </script>
+    <style>
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 5px;
+            margin: 50px auto;
+        }
+
+        .cell.disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #message {
+            text-align: center;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="text-center text-xl">Tic-Tac-Toe Game</h1>
+    <div class="m-2 flex flex-row">
+        <div class="basis-3/5">
+            <div id="message"></div>
+            <div class="grid grid-cols-3 gap-1" id="board"></div>
         </div>
-      </section>
-      <section>
-        <p id="showGameOrder1"></p>
-        <div id="historical1" class="historical">
-          <div class="hrow">
-            <div class="hcell1" id="hcell1-1"></div>
-            <div class="hcell1" id="hcell1-2"></div>
-            <div class="hcell1" id="hcell1-3"></div>
-          </div>
-          <div class="hrow">
-            <div class="hcell1" id="hcell1-4"></div>
-            <div class="hcell1" id="hcell1-5"></div>
-            <div class="hcell1" id="hcell1-6"></div>
-          </div>
-          <div class="hrow">
-            <div class="hcell1" id="hcell1-7"></div>
-            <div class="hcell1" id="hcell1-8"></div>
-            <div class="hcell1" id="hcell1-9"></div>
-          </div>
+        <div class="basis-2/5 p-2">
+            <p>History</p>
+            <ul id="history"></ul>
         </div>
-      </section>
-
-      <script>
-        var myVariable = loadFromLocalStorage();
-        console.log(myVariable[0]);
-        console.log(myVariable[1]);
-        var myOrder0 = [];
-        var myOrder1 = [];
-        if (myVariable.length >= 1 && myVariable[0].length > 3) {
-          for (var i = 0; i < myVariable[0].length; i++) {
-            if (i % 2 == 0) {
-              myOrder0.push("X:" + myVariable[0][i]);
-            } else {
-              myOrder0.push("O:" + myVariable[0][i]);
-            }
-          }
-        }
-        //call function to display historical order
-        dispalyHistoricalOrder("hcell0", myVariable[0]);
-        //get the last player who is the winner
-        let playerWin0 = myOrder0[myOrder0.length - 1].split(":")[0];
-        // document.getElementById("showGameOrder0").textContent =
-        //   myOrder0.join(", ");
-
-        document.getElementById("showGameOrder0").style.fontWeight = "bold";
-        document
-          .getElementById("showGameOrder0")
-          .appendChild(document.createElement("br"));
-        let newP0 = document.createElement("p");
-        newP0.id = "description0";
-        if (playerWin0) {
-          newP0.innerText = "Player " + playerWin0 + " Won";
-        } else {
-          newP0.style.visibility = "hidden";
-        }
-        newP0.className = "description";
-        newP0.style.fontWeight = "normal";
-
-        document.getElementById("showGameOrder0").appendChild(newP0);
-
-        if (myVariable.length > 1 && myVariable[1].length > 3) {
-          for (var i = 0; i < myVariable[1].length; i++) {
-            if (i % 2 == 0) {
-              myOrder1.push("X:" + myVariable[1][i]);
-            } else {
-              myOrder1.push("O:" + myVariable[1][i]);
-            }
-          }
-        }
-        //get the last player who is the winner
-        let playerWin1 = myOrder1[myOrder1.length - 1].split(":")[0];
-        // document.getElementById("showGameOrder0").textContent =
-        //   myOrder0.join(", ");
-        document.getElementById("showGameOrder1").textContent = "";
-        document.getElementById("showGameOrder1").style.fontWeight = "bold";
-        document
-          .getElementById("showGameOrder1")
-          .appendChild(document.createElement("br"));
-        let newP1 = document.createElement("p");
-        newP1.id = "description1";
-        if (playerWin1) {
-          newP1.innerText = "Player " + playerWin1 + " Won";
-        } else {
-          newP1.style.visibility = "hidden";
-        }
-        newP1.className = "description";
-        newP1.style.fontWeight = "normal";
-
-        document.getElementById("showGameOrder1").appendChild(newP1);
-        //call function to display historical order
-        dispalyHistoricalOrder("hcell1", myVariable[1]);
-      </script>
     </div>
-  </body>
+    <div>
+        <p>
+            Instructions: <span class="emphasize">Click</span> on an empty space to place your piece.
+            When you connect the dots, you win.
+
+        </p>
+    </div>
+    <script src="ttt.js"></script>
+</body>
+
 </html>
