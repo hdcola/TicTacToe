@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic-Tac-Toe Game</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css">
+    <style></style>
   </head>
   <body>
     <h1>Welcome to Tic-Tac-Toe Game</h1>
@@ -33,14 +34,39 @@
       </div>
     </div>
     <div id="gameMessage" class="game-message"></div>
-    <button id="resetButton">Reset Game</button>
+    <div>
+      <button id="resetButton">Reset Game</button>
+      <button id="clearButton">Clear History</button>
+      <!-- Button to open the custom modal -->
+      <button id="instructionsButton" onclick="openCustomModal()">
+        Game Instructions
+      </button>
+
+      <!-- Custom modal -->
+      <div class="custom-modal" id="customModal">
+        <div class="modal-content">
+          <span class="close-button" onclick="closeCustomModal()">&times;</span>
+          <h2>Game Instructions</h2>
+          <p id="modal-text">
+            The goal of Tic Tac Toe is to be the first player to get three of
+            your marks in a row (horizontally, vertically, or diagonally) on a
+            3x3 grid.
+            <br><br>
+            <span class="emphasize"> Setup </span> The game is played on a grid
+            that's 3 squares by 3 squares. One player is "X", and the other
+            player is "O". Players take turns putting their marks in empty
+            squares.
+          </p>
+        </div>
+      </div>
+    </div>
     <script src="script.js"></script>
     <div>
       <div>
         <h3>Last 2 Historical Games with winners:</h3>
       </div>
       <section>
-        <p id="showGameOrder0"></p>
+        <h4 id="showGameOrder0">&nbsp;</h4>
         <div id="historical0" class="historical">
           <div class="hrow">
             <div class="hcell0" id="hcell0-1"></div>
@@ -60,7 +86,7 @@
         </div>
       </section>
       <section>
-        <p id="showGameOrder1"></p>
+        <h4 id="showGameOrder1">&nbsp;</h4>
         <div id="historical1" class="historical">
           <div class="hrow">
             <div class="hcell1" id="hcell1-1"></div>
@@ -95,12 +121,9 @@
             }
           }
         }
-        //call function to display historical order
         dispalyHistoricalOrder("hcell0", myVariable[0]);
-        //get the last player who is the winner
+
         let playerWin0 = myOrder0[myOrder0.length - 1].split(":")[0];
-        // document.getElementById("showGameOrder0").textContent =
-        //   myOrder0.join(", ");
 
         document.getElementById("showGameOrder0").style.fontWeight = "bold";
         document
@@ -109,13 +132,12 @@
         let newP0 = document.createElement("p");
         newP0.id = "description0";
         if (playerWin0) {
-          newP0.innerText = "Player " + playerWin0 + " Won";
+          newP0.innerText = "Player " + playerWin0 + " Won in the last game";
         } else {
           newP0.style.visibility = "hidden";
         }
         newP0.className = "description";
         newP0.style.fontWeight = "normal";
-
         document.getElementById("showGameOrder0").appendChild(newP0);
 
         if (myVariable.length > 1 && myVariable[1].length > 3) {
@@ -127,10 +149,9 @@
             }
           }
         }
-        //get the last player who is the winner
+
         let playerWin1 = myOrder1[myOrder1.length - 1].split(":")[0];
-        // document.getElementById("showGameOrder0").textContent =
-        //   myOrder0.join(", ");
+
         document.getElementById("showGameOrder1").textContent = "";
         document.getElementById("showGameOrder1").style.fontWeight = "bold";
         document
@@ -139,7 +160,8 @@
         let newP1 = document.createElement("p");
         newP1.id = "description1";
         if (playerWin1) {
-          newP1.innerText = "Player " + playerWin1 + " Won";
+          newP1.innerText =
+            "Player " + playerWin1 + " Won in the penultimate game";
         } else {
           newP1.style.visibility = "hidden";
         }
@@ -147,8 +169,15 @@
         newP1.style.fontWeight = "normal";
 
         document.getElementById("showGameOrder1").appendChild(newP1);
-        //call function to display historical order
         dispalyHistoricalOrder("hcell1", myVariable[1]);
+
+        function openCustomModal() {
+          document.getElementById("customModal").style.display = "block";
+        }
+
+        function closeCustomModal() {
+          document.getElementById("customModal").style.display = "none";
+        }
       </script>
     </div>
   </body>

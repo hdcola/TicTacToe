@@ -60,7 +60,6 @@ body {
   height: 60px;
   font-weight: bold;
   color: rgb(20, 20, 238);
-  align-items: right;
   background: linear-gradient(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.6));
   background-image: url("https://svgsilh.com/svg/146018.svg");
   background-repeat: no-repeat;
@@ -95,7 +94,7 @@ body {
   padding: 10px 20px;
   font-size: 1rem;
   color: #fff;
-  background-color: #333;
+  background-color: #771111;
   border: none;
   cursor: pointer;
   border-radius: 5px;
@@ -103,6 +102,36 @@ body {
 }
 
 #resetButton:hover {
+  color: #000;
+}
+
+#clearButton {
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #0eb499;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.7s ease;
+}
+
+#clearButton:hover {
+  color: #000;
+}
+
+#instructionsButton {
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #8f9e09;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.7s ease;
+}
+
+#instructionsButton:hover {
   color: #000;
 }
 
@@ -114,4 +143,36 @@ main section {
 .emphasize {
   font-weight: bold;
   color: purple;
+}
+
+/* Custom modal styles */
+.custom-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+.modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+#modal-text {
+  font-size: 1.2rem;
 }
