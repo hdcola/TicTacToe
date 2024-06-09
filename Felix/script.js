@@ -1,35 +1,49 @@
-let currentPlayer = "X"; // Player X always starts
-let gameBoard = ["", "", "", "", "", "", "", "", ""]; // 3x3 game board
-let gameOrder = [];
-let gameActive = true;
+var currentPlayer = "X";
+var gameBoard = ["", "", "", "", "", "", "", "", ""];
+var gameOrder = [];
+var gameActive = true;
 
+const cells = document.querySelectorAll(".cell");
+
+/** List all the ways to win the game. */
+const winConditions = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
+];
+
+/** The function call localStorage.setItem() to save the result of game.
+ * @param {string} key - The key to save the game result.
+ * @param {array} array - The array to save the game result.
+ */
 function saveToLocalStorage(key, array) {
-  // transform the array into a string
   const arrayString = JSON.stringify(array);
-  // use the key to save the string in local storage
   localStorage.setItem(key, arrayString);
   console.log(`Saved to Local Storage: ${key} => ${arrayString}`);
 }
 
+/** The function call the getAllLocalStorageItems() function to get local storage.
+ * if length of the items is 1, return the last item.
+ * if length of the items is 2, return the last two items.
+ * @returns {array} - The array of the game result.
+ */
 function loadFromLocalStorage() {
-  // load the string from local storage using the key
   var allItems = getAllLocalStorageItems();
   if (Object.keys(allItems).length === 0) {
     return [];
-  }
-  // sort the return with the key
-  else {
+  } else {
     let keys = Object.keys(allItems);
     keys.sort();
-
-    // if there is only one key-value pair, return the value
     if (Object.keys(allItems).length === 1) {
       var key = keys[0];
       var item = JSON.parse(allItems[key]);
       return [item];
-    }
-    // if there are more than one key-value pairs, return the last two values
-    else {
+    } else {
       var lastKey = keys[keys.length - 1];
       var secondLastKey = keys[keys.length - 2];
       var lastItem = JSON.parse(allItems[lastKey]);
@@ -39,19 +53,28 @@ function loadFromLocalStorage() {
   }
 }
 
+/** The function get all items from local storage.
+ * @returns {object} - The object of the items.
+ */
 function getAllLocalStorageItems() {
-  let items = {}; // create an empty object to store the key-value pairs
+  let items = {};
   for (let i = 0; i < localStorage.length; i++) {
-    // get the key at index i
     let key = localStorage.key(i);
-    // get the value of the key
     let value = localStorage.getItem(key);
-    // add the key-value pair to the object
     items[key] = value;
   }
   return items;
 }
 
+/** The function clear the local storage and reload the page. */
+function clearLocalStorage() {
+  localStorage.clear();
+  location.reload();
+}
+
+/** The function get the parameter of last player's input and switch to the other player's turn.
+ * @param {number} clickedCellIndex - The index of the clicked cell.
+ */
 function handlePlayerTurn(clickedCellIndex) {
   if (gameBoard[clickedCellIndex] !== "" || !gameActive) {
     return;
@@ -62,6 +85,9 @@ function handlePlayerTurn(clickedCellIndex) {
   currentPlayer = currentPlayer === "X" ? "O" : "X";
 }
 
+/** The function get the parameter of clicked cell event and check which cell is clicked.
+ * @param {object} clickedCellEvent - The clicked cell event.
+ */
 function cellClicked(clickedCellEvent) {
   const clickedCell = clickedCellEvent.target;
   const clickedCellIndex = parseInt(clickedCell.id.replace("cell-", "")) - 1;
@@ -72,46 +98,24 @@ function cellClicked(clickedCellEvent) {
   updateUI();
 }
 
-const cells = document.querySelectorAll(".cell");
-
-cells.forEach((cell) => {
-  cell.addEventListener("click", cellClicked, false);
-});
-
+/** The function update the game board.
+ * Traverse the game board and update the cell text.
+ */
 function updateUI() {
   for (let i = 0; i < cells.length; i++) {
     cells[i].innerText = gameBoard[i];
   }
 }
 
+/** The function add the clicked cell index to the game order array.
+ * For storing the game order.
+ * @param {number} clickedCellIndex - The index of the clicked cell.
+ */
 function updateGameOrder(clickedCellIndex) {
   gameOrder.push(clickedCellIndex);
 }
 
-function announceWinner(player) {
-  const messageElement = document.getElementById("gameMessage");
-  messageElement.innerText = `Player ${player} Wins!`;
-  const timestamp = new Date().getTime();
-  var timestampStr = timestamp.toString();
-  saveToLocalStorage(timestampStr, gameOrder);
-}
-
-function announceDraw() {
-  const messageElement = document.getElementById("gameMessage");
-  messageElement.innerText = "Game Draw!";
-}
-
-const winConditions = [
-  [0, 1, 2], // Top row
-  [3, 4, 5], // Middle row
-  [6, 7, 8], // Bottom row
-  [0, 3, 6], // Left column
-  [1, 4, 7], // Middle column
-  [2, 5, 8], // Right column
-  [0, 4, 8], // Left-to-right diagonal
-  [2, 4, 6], // Right-to-left diagonal
-];
-
+/** The function get the parameter of the winner and announce the winner. */
 function checkForWinOrDraw() {
   let roundWon = false;
 
@@ -126,13 +130,11 @@ function checkForWinOrDraw() {
       break;
     }
   }
-
   if (roundWon) {
     announceWinner(currentPlayer);
     gameActive = false;
     return;
   }
-
   let roundDraw = !gameBoard.includes("");
   if (roundDraw) {
     announceDraw();
@@ -141,6 +143,28 @@ function checkForWinOrDraw() {
   }
 }
 
+/** The function check the game board for win.
+ * @param {string} player - The player who wins the game.
+ * Call the saveToLocalStorage() function to save the game result.
+ * The key is the timestamp of the game end.
+ */
+function announceWinner(player) {
+  const messageElement = document.getElementById("gameMessage");
+  messageElement.innerText = `Player ${player} Wins!`;
+  const timestamp = new Date().getTime();
+  var timestampStr = timestamp.toString();
+  saveToLocalStorage(timestampStr, gameOrder);
+}
+
+/** The function get the parameter of the winner and announce the winner.
+ * No save the game result.
+ */
+function announceDraw() {
+  const messageElement = document.getElementById("gameMessage");
+  messageElement.innerText = "Game Draw!";
+}
+
+/** The function reset the game board and game order. */
 function resetGame() {
   gameBoard = ["", "", "", "", "", "", "", "", ""];
   gameActive = true;
@@ -153,40 +177,11 @@ function resetGame() {
   location.reload();
 }
 
-window.onload = function () {
-  // sortLocalStorage();
-  sortLocalStorage();
-  // get the last two game orders from local storage
-  let gameOrder = loadFromLocalStorage();
-};
-
-function sortLocalStorage() {
-  // get all items from Local Storage
-  let allItems = getAllLocalStorageItems();
-  // sort the keys
-  let keys = Object.keys(allItems);
-  for (let i = 0; i < keys.length; i++) {
-    keys[i] = parseInt(keys[i]);
-  }
-  keys.sort();
-  for (let i = 0; i < keys.length; i++) {
-    keys[i] = keys[i].toString();
-  }
-
-  // create a new object to store the sorted items
-  let sortedItems = {};
-  // add the sorted items to the new object
-  keys.forEach((key) => {
-    sortedItems[key] = allItems[key];
-  });
-  // clear the Local Storage
-  localStorage.clear();
-  // save the sorted items to Local Storage
-  for (let key in sortedItems) {
-    localStorage.setItem(key, sortedItems[key]);
-  }
-}
-
+/** The function get the parameter of the query class and the game order.
+ * Renew the game board with the historical order.
+ * @param {string} queryClass - The query
+ * @param {array} interfaceGameOrder - The game order.
+ */
 function dispalyHistoricalOrder(queryClass, interfaceGameOrder) {
   const hcells = document.querySelectorAll("." + queryClass);
   let temp = [];
@@ -202,5 +197,45 @@ function dispalyHistoricalOrder(queryClass, interfaceGameOrder) {
   }
 }
 
+/** The function load the localstorage record,
+ * sort the record and storage the sorted data.
+ */
+function sortLocalStorage() {
+  let allItems = getAllLocalStorageItems();
+  let keys = Object.keys(allItems);
+  for (let i = 0; i < keys.length; i++) {
+    keys[i] = parseInt(keys[i]);
+  }
+  keys.sort();
+  for (let i = 0; i < keys.length; i++) {
+    keys[i] = keys[i].toString();
+  }
+  let sortedItems = {};
+  keys.forEach((key) => {
+    sortedItems[key] = allItems[key];
+  });
+  localStorage.clear();
+  for (let key in sortedItems) {
+    localStorage.setItem(key, sortedItems[key]);
+  }
+}
+
+/** When page is loaded, call the sortLocalStorage() function to find the last 2 game record.
+ * Call the loadFromLocalStorage() function to load the game record.
+ * Game order is the last 2 game record, and be called in the html file.
+ */
+window.onload = function () {
+  sortLocalStorage();
+  let gameOrder = loadFromLocalStorage();
+};
+
+/**Add a click event listener for each cell in the game board. */
+cells.forEach((cell) => {
+  cell.addEventListener("click", cellClicked, false);
+});
+
 const resetButton = document.getElementById("resetButton");
 resetButton.addEventListener("click", resetGame, false);
+
+const clearButton = document.getElementById("clearButton");
+clearButton.addEventListener("click", clearLocalStorage, false);
