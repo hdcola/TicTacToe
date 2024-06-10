@@ -17,6 +17,8 @@ const winConditions = [
   [2, 4, 6],
 ];
 
+var playedGames = [];
+
 /** The function call localStorage.setItem() to save the result of game.
  * @param {string} key - The key to save the game result.
  * @param {array} array - The array to save the game result.
@@ -81,7 +83,7 @@ function handlePlayerTurn(clickedCellIndex) {
   }
   updateGameOrder(clickedCellIndex);
   gameBoard[clickedCellIndex] = currentPlayer;
-  checkForWinOrDraw();
+  checkForWinOrDraw(currentPlayer);
   currentPlayer = currentPlayer === "X" ? "O" : "X";
 }
 
@@ -116,7 +118,7 @@ function updateGameOrder(clickedCellIndex) {
 }
 
 /** The function get the parameter of the winner and announce the winner. */
-function checkForWinOrDraw() {
+function checkForWinOrDraw(currentPlayer) {
   let roundWon = false;
 
   for (let i = 0; i < winConditions.length; i++) {
@@ -132,12 +134,21 @@ function checkForWinOrDraw() {
   }
   if (roundWon) {
     announceWinner(currentPlayer);
+    console.log(currentPlayer);
+    if (currentPlayer === "X") {
+      playedGames.push(1);
+    } else {
+      playedGames.push(-1);
+    }
+    saveToLocalStorage("0", playedGames);
     gameActive = false;
     return;
   }
   let roundDraw = !gameBoard.includes("");
   if (roundDraw) {
     announceDraw();
+    playedGames.push(0);
+    saveToLocalStorage("0", playedGames);
     gameActive = false;
     return;
   }
@@ -185,14 +196,16 @@ function resetGame() {
 function dispalyHistoricalOrder(queryClass, interfaceGameOrder) {
   const hcells = document.querySelectorAll("." + queryClass);
   let temp = [];
-  for (let i = 0; i < interfaceGameOrder.length; i++) {
-    if (i % 2 === 0) {
-      hcells[interfaceGameOrder[i]].className = queryClass + " x-img";
-      hcells[interfaceGameOrder[i]].innerText = i + 1 - temp.length;
-      temp.push(i);
-    } else {
-      hcells[interfaceGameOrder[i]].className = queryClass + " o-img";
-      hcells[interfaceGameOrder[i]].innerText = i + 1 - temp.length;
+  if (interfaceGameOrder) {
+    for (let i = 0; i < interfaceGameOrder.length; i++) {
+      if (i % 2 === 0) {
+        hcells[interfaceGameOrder[i]].className = queryClass + " x-img";
+        hcells[interfaceGameOrder[i]].innerText = i + 1 - temp.length;
+        temp.push(i);
+      } else {
+        hcells[interfaceGameOrder[i]].className = queryClass + " o-img";
+        hcells[interfaceGameOrder[i]].innerText = i + 1 - temp.length;
+      }
     }
   }
 }
@@ -220,6 +233,56 @@ function sortLocalStorage() {
   }
 }
 
+function loadPlayedGames() {
+  playedGames = localStorage.getItem("0");
+  if (!playedGames || playedGames.length === 0) {
+    playedGames = [];
+  } else {
+    playedGames = JSON.parse(playedGames);
+  }
+}
+
+function countWins(playedGames, winner) {
+  return playedGames.filter((currentElement) => currentElement === winner)
+    .length;
+}
+
+function statics() {
+  loadPlayedGames();
+  if (playedGames && playedGames != null && playedGames.length > 0) {
+    let xWins = 0;
+    let oWins = 0;
+    let draws = 0;
+    xWins = countWins(playedGames, 1);
+    oWins = countWins(playedGames, -1);
+    draws = countWins(playedGames, 0);
+    let totalGames = 0;
+    let winRateX = 0;
+    let winRateO = 0;
+    let drawRate = 0;
+    totalGames = playedGames.length;
+    winRateX = (xWins / totalGames) * 100;
+    winRateO = (oWins / totalGames) * 100;
+    drawRate = (draws / totalGames) * 100;
+    document.getElementById("modalTitle").innerText = "Game Statistics:";
+    document.getElementById("winningRateContent").style.display = "block";
+    document.getElementById("xWins").innerText = xWins;
+    document.getElementById("oWins").innerText = oWins;
+    document.getElementById("draws").innerText = draws;
+    document.getElementById("totalGames").innerText = totalGames;
+    document.getElementById("winRateX").innerText = winRateX.toFixed(2);
+    document.getElementById("winRateO").innerText = winRateO.toFixed(2);
+    if (xWins > oWins) {
+      document.getElementById("xWins").classList.add("emphasize");
+      document.getElementById("winRateX").classList.add("emphasize");
+    } else {
+      document.getElementById("oWins").classList.add("emphasize");
+      document.getElementById("winRateO").classList.add("emphasize");
+    }
+    // document.getElementById("drawRate").innerText = drawRate;
+  }
+}
+
 /** When page is loaded, call the sortLocalStorage() function to find the last 2 game record.
  * Call the loadFromLocalStorage() function to load the game record.
  * Game order is the last 2 game record, and be called in the html file.
@@ -227,6 +290,7 @@ function sortLocalStorage() {
 window.onload = function () {
   sortLocalStorage();
   let gameOrder = loadFromLocalStorage();
+  statics();
 };
 
 /**Add a click event listener for each cell in the game board. */
